@@ -49,10 +49,10 @@ async fn main() -> std::io::Result<()> {
         .filter(None, LevelFilter::Info)
         .init();
 
-    let model_name = "plagiarism_checker";
+    let model_name = "plagiarism multilang detection version 0.1";
     let model = Model::new(
         model_name.to_owned(),
-        "saved_models/plagiarism_binary_classification2_model.h5".to_owned(),
+        "plagiarism_binary_multilang_classification1_model.h5".to_owned(),
     );
     // Create some global state prior to building the server
     #[allow(clippy::mutex_atomic)] // it's intentional.
