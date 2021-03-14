@@ -43,3 +43,11 @@ You need to set environment variables `LD_LIBRARY_PATH` and `PYO3_PYTHON` to lin
 export LD_LIBRARY_PATH='/home/user/miniconda3/lib/'
 export PYO3_PYTHON='/home/user/miniconda3/bin/python3'
 ```
+
+## How to run
+
+```sh
+pip install -r requirements.txt
+pip install -Uqr models/official/requirements.txt
+cargo run
+```

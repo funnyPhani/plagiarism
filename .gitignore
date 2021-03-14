@@ -1,4 +1,4 @@
 /target
 Cargo.lock
 models
-saved_models
+plagiarism_server/saved_models
