@@ -53,8 +53,8 @@ export PYO3_PYTHON='/home/user/miniconda3/bin/python3'
 ## How to run plagiarism server
 
 ```sh
+cd plagiarism_server
 pip install -r requirements.txt
 pip install -Uqr models/official/requirements.txt
-cd plagiarism_server
 cargo run
 ```

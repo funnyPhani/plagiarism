@@ -13,21 +13,18 @@ use models::models::Model;
 mod models;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct IndexRequest {
+struct PlagiarismRequest {
     text_a: String,
     text_b: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct IndexResponse {
-    plagiarism: bool,
-    accuracy: f32,
-}
-
-async fn index(item: web::Json<IndexRequest>, model: web::Data<Mutex<Model>>) -> HttpResponse {
+async fn index(
+    items: web::Json<Vec<PlagiarismRequest>>,
+    model: web::Data<Mutex<Model>>,
+) -> HttpResponse {
     let model = model.lock().unwrap();
-    let text_a = vec![item.text_a.to_owned()];
-    let text_b = vec![item.text_b.to_owned()];
+    let text_a = items.iter().map(|item| item.text_a.clone()).collect();
+    let text_b = items.iter().map(|item| item.text_b.clone()).collect();
     let prediction = model.check_plagiarism(text_a, text_b).unwrap();
     HttpResponse::Ok().json(prediction)
 }
@@ -64,7 +61,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(model.clone()) // add shared state
             .wrap(middleware::Logger::default())
-            .data(web::JsonConfig::default().limit(8192))
+            .data(web::JsonConfig::default().limit(1048576))
             .service(web::resource("/").route(web::post().to(index)))
     })
     .bind("127.0.0.1:8088")?
