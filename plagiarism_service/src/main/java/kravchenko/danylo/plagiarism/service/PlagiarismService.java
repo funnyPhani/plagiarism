@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
