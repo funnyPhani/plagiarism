@@ -55,6 +55,7 @@ export PYO3_PYTHON='/home/user/miniconda3/bin/python3'
 ```sh
 cd plagiarism_server
 pip install -r requirements.txt
+git clone --depth 1 -b v2.3.0 https://github.com/tensorflow/models.git
 pip install -Uqr models/official/requirements.txt
 cargo run
 ```
