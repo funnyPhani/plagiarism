@@ -60,6 +60,7 @@ public class PlagiarismService {
         int startIndex = 0;
         int endIndex = symbolBatch+50+1;
         while(startIndex < text.length()) {
+            // end of the batch will be the end of the original text
             if (endIndex >= text.length()) {
                 result.add(text.substring(startIndex));
                 break;
