@@ -23,6 +23,8 @@ public class PlagiarismService {
 
     @Value("${remoteUrl}")
     private String remoteUrl;
+    @Value("${symbolBatch}")
+    private Integer symbolBatch;
 
     /*
      * make a remote request to plagiarism server
@@ -51,12 +53,12 @@ public class PlagiarismService {
      * Split text into chunks
      */
     private List<String> splitText(final String text) {
-        if (text.length() <= 550) {
+        if (text.length() <= symbolBatch+50) {
             return new ArrayList<>(){{add(text);}};
         }
         List<String> result = new ArrayList<>();
         int startIndex = 0;
-        int endIndex = 551;
+        int endIndex = symbolBatch+50+1;
         while(endIndex <= text.length()) {
             int searchStartIndex = endIndex-80;
             // substring where to search for the end of the input sentence
@@ -75,7 +77,7 @@ public class PlagiarismService {
             result.add(text.substring(startIndex, searchStartIndex + sentenceEnd));
 
             startIndex = searchStartIndex + sentenceEnd + 1;
-            endIndex = startIndex+500;
+            endIndex = startIndex+symbolBatch;
         }
 
         return result;
@@ -104,7 +106,7 @@ public class PlagiarismService {
     private PlagiarismReview highlightPlagiarism(final List<PlagiarismResponseItem> items, final String textA, final String textB) {
         PlagiarismReview result = new PlagiarismReview();
 
-        double plagiarismLevel = items.stream()
+        int plagiarismLength = items.stream()
                 .filter(PlagiarismResponseItem::isPlagiarism)
                 .map(item -> {
                     int startIndexTextA = textA.indexOf(item.getTextA());
@@ -114,9 +116,10 @@ public class PlagiarismService {
 
                     result.addHighlight(startIndexTextA, endIndexTextA, startIndexTextB, endIndexTextB, item.getAccuracy());
 
-                    return item.getAccuracy();
-                }).mapToDouble(i -> i).average()
-                .orElse(0);
+                    return item.getTextA().length();
+                }).mapToInt(i -> i).sum();
+
+        double plagiarismLevel = (plagiarismLength / (double)(textA.length()));
 
         result.setPlagiarismLevel(plagiarismLevel);
         return result;
@@ -127,7 +130,7 @@ public class PlagiarismService {
      */
     public PlagiarismReview analyzePlagiarism(final PlagiarismRequestItem item) {
         // split big texts to small ones and pass them to plagiarism server
-        if (item.getTextA().length() > 500 || item.getTextB().length() > 500) {
+        if (item.getTextA().length() > symbolBatch || item.getTextB().length() > symbolBatch) {
             List<String> textA = splitText(item.getTextA());
             List<String> textB = splitText(item.getTextB());
             List<PlagiarismRequestItem> items = createTextPairs(textA, textB);
