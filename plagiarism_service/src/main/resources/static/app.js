@@ -13,14 +13,14 @@ $(function() {
         }
     }
 
-    function generate_main_progres_bar(data) {
+    function generate_main_progress_bar(data) {
         let plagiarismPercent = to_percents(data.plagiarismLevel);
 
         let html = `
 				<h2>Plagiarism level</h2>
 				<div class="progress" style="height: 50px;">
 					<div class="progress-bar ${percent_to_color_class(plagiarismPercent)}" role="progressbar"
-						style="width: ${plagiarismPercent}%;" aria-valuenow="${plagiarismPercent}" 
+						style="width: ${plagiarismPercent > 10? plagiarismPercent: 100}%;" aria-valuenow="${plagiarismPercent}" 
 						aria-valuemin="0" aria-valuemax="100">
 					${plagiarismPercent}%
 					</div>
@@ -29,8 +29,8 @@ $(function() {
     }
 
 
-    function generate_hight_batches(text_A, text_B, data) {
-        $('#report').append(`<br><h2>Hight plagiarism batches</h2>`);
+    function generate_high_plagiarism_batches(text_A, text_B, data) {
+        $('#report').append(`<br><h2>Parts with high plagiarism level</h2>`);
         data.highlights.forEach(function(elem) {
             let plagiarismPercent = to_percents(elem.plagiarismLevel);
 
@@ -93,10 +93,12 @@ $(function() {
 
 
     function generate_report(text_A, text_B, data) {
-        $('#report').html('');
-        generate_main_progres_bar(data);
-        generate_hight_batches(text_A, text_B, data);
-        generate_full_text_highlights(text_A, text_B, data);
+
+        generate_main_progress_bar(data);
+        if (data.highlights.length > 0) {
+            generate_high_plagiarism_batches(text_A, text_B, data);
+            generate_full_text_highlights(text_A, text_B, data);
+        }
     }
 
     function make_request(text_A, text_B){
@@ -113,58 +115,25 @@ $(function() {
             },
             success: function (data) {
                 generate_report(text_A, text_B, data);
+                $('#loading').attr('style', 'display:none !important');
+                $('#generate-button-div').show();
             }
         });
     }
 
 
     $('#generate-button').click(function() {
-        // delete generate button
-        $('#generate-button-div').attr('style', 'display:none !important');
-        //show loading bar
-        $('#loading').show();
-
         let text_A = $('#floatingTextarea1').val();
         let text_B = $('#floatingTextarea2').val();
 
-        make_request(text_A, text_B);
-
-        // REQUEST MINI MOCK
-        // generate_report(
-        //     `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sagittis, orci id tristique efficitur, eros risus semper sapien, quis semper erat nunc tincidunt justo. Nunc sit amet neque quis urna dignissim accumsan. Phasellus ut laoreet ipsum. Nulla suscipit ante ut rutrum fermentum. Pellentesque sed blandit risus. Quisque in tempor tellus. Curabitur feugiat pretium est non feugiat. Duis sit amet sagittis nunc. Nullam in quam eu neque accumsan sodales. In interdum lorem id risus eleifend vulputate. Maecenas ullamcorper congue porta. Mauris enim mi, vehicula ac nulla sit amet, commodo rhoncus orci. Curabitur tortor nunc, bibendum at rutrum at, ornare sed ligula. Donec porta ipsum massa, ac ultricies dolor venenatis at. Praesent at libero velit.`,
-        //     `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sagittis, orci id tristique efficitur, eros risus semper sapien, quis semper erat nunc tincidunt justo. Nunc sit amet neque quis urna dignissim accumsan. Phasellus ut laoreet ipsum. Nulla suscipit ante ut rutrum fermentum. Pellentesque sed blandit risus. Quisque in tempor tellus. Curabitur feugiat pretium est non feugiat. Duis sit amet sagittis nunc. Nullam in quam eu neque accumsan sodales. In interdum lorem id risus eleifend vulputate. Maecenas ullamcorper congue porta. Mauris enim mi, vehicula ac nulla sit amet, commodo rhoncus orci. Curabitur tortor nunc, bibendum at rutrum at, ornare sed ligula. Donec porta ipsum massa, ac ultricies dolor venenatis at. Praesent at libero velit.`,
-        //     {
-        //         plagiarismLevel: 0.3742432236671448,
-        //         highlights: [
-        //             {
-        //                 textA: {
-        //                     startIndex: 0,
-        //                     endIndex: 200
-        //                 },
-        //                 textB: {
-        //                     startIndex: 0,
-        //                     endIndex: 200
-        //                 },
-        //                 plagiarismLevel: 0.9999898672103882
-        //             },
-        //             {
-        //                 textA: {
-        //                     startIndex: 301,
-        //                     endIndex: 500
-        //                 },
-        //                 textB: {
-        //                     startIndex: 300,
-        //                     endIndex: 500
-        //                 },
-        //                 plagiarismLevel: 0.7599898672103882
-        //             }
-        //         ]
-        //
-        //     }
-        // );
-
-        $('#loading').attr('style', 'display:none !important');
-        $('#generate-button-div').show();
+        if (text_A.length > 0 && text_B.length> 0) {
+            $('#report').html('');
+            // delete generate button
+            $('#generate-button-div').attr('style', 'display:none !important');
+            //show loading bar
+            $('#loading').show();
+            make_request(text_A, text_B);
+        }
 
     });
 });
