@@ -59,8 +59,13 @@ public class PlagiarismService {
         List<String> result = new ArrayList<>();
         int startIndex = 0;
         int endIndex = symbolBatch+50+1;
-        while(endIndex <= text.length()) {
+        while(startIndex < text.length()) {
+            if (endIndex >= text.length()) {
+                result.add(text.substring(startIndex));
+                break;
+            }
             int searchStartIndex = endIndex-80;
+
             // substring where to search for the end of the input sentence
             String dotToFind = text.substring(searchStartIndex, endIndex);
             // index of the dot
@@ -78,6 +83,9 @@ public class PlagiarismService {
 
             startIndex = searchStartIndex + sentenceEnd + 1;
             endIndex = startIndex+symbolBatch;
+            if (endIndex >= text.length()) {
+                endIndex = text.length();
+            }
         }
 
         return result;
